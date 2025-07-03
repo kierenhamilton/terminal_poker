@@ -92,13 +92,13 @@ void display_card_ascii(Card &card) {
   };
   switch (card.suit) {
   case Suit::CLUBS:
-    suit = "";
+    suit = "♣";
   case Suit::DIAMONDS:
-    suit = "";
+    suit = "♦";
   case Suit::HEARTS:
-    suit = "";
+    suit = "♥";
   case Suit::SPADES:
-    suit = "";
+    suit = "♠";
   };
 }
 
