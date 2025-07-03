@@ -25,11 +25,11 @@ void Game::add_player(std::string name, int money) {
 }
 
 void Game::display_cards() {
+  Card_ascii temp;
   for (Card card : hidden_cards) {
+
   };
 }
-
-void display_face_down() { std::cout << ""; }
 
 void display_card_ascii(Card card) {
   std::string suit;

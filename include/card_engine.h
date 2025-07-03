@@ -28,6 +28,7 @@ enum class Suit {
 };
 
 struct Card_ascii {
+  Card_ascii () : line1(""), line2(""), line3(""), line4(""), line5("") {};
   std::string line1;
   std::string line2;
   std::string line3;
