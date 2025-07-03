@@ -61,6 +61,46 @@ void display(std::vector<Card> &deck) {
   }
 }
 
+
+void display_card_ascii(Card &card) {
+  std::string suit;
+  std::string rank;
+  switch (card.value) {
+  case Value::ACE:
+    rank = " A";
+  case Value::TWO:
+    rank = " 2";
+  case Value::THREE:
+    rank = " 3";
+  case Value::FOUR:
+    rank = " 4";
+  case Value::FIVE:
+    rank = " 5";
+  case Value::SIX:
+    rank = " 6";
+  case Value::SEVEN:
+    rank = " 7";
+  case Value::EIGHT:
+    rank = " 8";
+  case Value::NINE:
+    rank = " 9";
+  case Value::TEN:
+    rank = "10";
+  case Value::JACK:
+    rank = " J";
+  case Value::QUEEN:
+    rank = " Q";
+  case Value::KING:
+    rank = " K";
+  };
+  switch (card.suit){
+    case Suit::CLUBS: suit = "";
+    case Suit::DIAMONDS: suit = "";
+    case Suit::HEARTS: suit = "";
+    case Suit::SPADES: suit = "";
+  };
+}
+
 void display(Card & card)
 {
 

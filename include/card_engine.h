@@ -39,6 +39,8 @@ std::string_view get_value_name(const Value value);
 
 Card draw_card(std::vector<Card> &deck);
 
+void display_card_ascii(Card &card);
+
 void display(std::vector<Card> &deck);
 
 void display(Card &card);

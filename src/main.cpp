@@ -5,7 +5,6 @@
 
 int main() {
 
-  Player a;
   std::vector<Card> deck;
   init_deck(deck);
 

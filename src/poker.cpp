@@ -1,6 +1,8 @@
 #include "poker.h"
 #include "card_engine.h"
+#include <iostream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 void Game::setup() {
@@ -22,3 +24,42 @@ void Game::add_player(std::string name, int money) {
   player_number++;
 }
 
+void Game::display_cards() {
+  for (Card card : hidden_cards) {
+  };
+}
+
+void display_face_down() { std::cout << ""; }
+
+void display_card_ascii(Card card) {
+  std::string suit;
+  std::string rank;
+  switch (card.value) {
+  case Value::ACE:
+    rank = " A";
+  case Value::TWO:
+    rank = " 2";
+  case Value::THREE:
+    rank = " 3";
+  case Value::FOUR:
+    rank = " 4";
+  case Value::FIVE:
+    rank = " 5";
+  case Value::SIX:
+    rank = " 6";
+  case Value::SEVEN:
+    rank = " 7";
+  case Value::EIGHT:
+    rank = " 8";
+  case Value::NINE:
+    rank = " 9";
+  case Value::TEN:
+    rank = "10";
+  case Value::JACK:
+    rank = " J";
+  case Value::QUEEN:
+    rank = " Q";
+  case Value::KING:
+    rank = " K";
+  }
+}

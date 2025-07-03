@@ -12,6 +12,8 @@ enum phase_e {
   TURNOVER,
 };
 
+void display_face_down();
+
 class Player {
 public:
   Player(std::string player_name, int player_money)
