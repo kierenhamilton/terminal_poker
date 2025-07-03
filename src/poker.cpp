@@ -2,7 +2,6 @@
 #include "card_engine.h"
 #include <iostream>
 #include <string>
-#include <string_view>
 #include <vector>
 
 void Game::setup() {
@@ -19,47 +18,84 @@ void Game::setup() {
   }
 }
 
-void Game::add_player(std::string name, int money) {
-  players.push_back(Player(name, money));
+void Game::add_player(std::string name, int money, bool user) {
+  players.push_back(Player(name, money, user));
   player_number++;
 }
 
-void Game::display_cards() {
-  Card_ascii temp;
-  for (Card card : hidden_cards) {
-
-  };
-}
-
-void display_card_ascii(Card card) {
-  std::string suit;
-  std::string rank;
-  switch (card.value) {
-  case Value::ACE:
-    rank = " A";
-  case Value::TWO:
-    rank = " 2";
-  case Value::THREE:
-    rank = " 3";
-  case Value::FOUR:
-    rank = " 4";
-  case Value::FIVE:
-    rank = " 5";
-  case Value::SIX:
-    rank = " 6";
-  case Value::SEVEN:
-    rank = " 7";
-  case Value::EIGHT:
-    rank = " 8";
-  case Value::NINE:
-    rank = " 9";
-  case Value::TEN:
-    rank = "10";
-  case Value::JACK:
-    rank = " J";
-  case Value::QUEEN:
-    rank = " Q";
-  case Value::KING:
-    rank = " K";
+void Game::display_phase() {
+  switch (phase) {
+  case PREFLOP:
+    std::cout << "PREFLOP\n";
+    break;
+  case FLOP:
+    std::cout << "FLOP\n";
+    break;
+  case RIVER:
+    std::cout << "RIVER\n";
+    break;
+  case TURNOVER:
+    std::cout << "TURNOVER\n";
+    break;
   }
 }
+
+void Game::display_cards() {
+  Card_ascii cards;
+  for (Card &card : hidden_cards) {
+    Card_ascii temp = get_face_down_ascii();
+    cards = cards + temp;
+  };
+
+  for (Card &card : shown_cards) {
+    Card_ascii temp = get_card_ascii(card);
+    cards = cards + temp;
+  }
+
+  display_card_ascii(cards);
+}
+
+void Game::display_players() {
+  std::string player_names = "";
+  std::string username;
+  for (Player player : players) {
+    if (player.get_user())
+      username = "> " + player.get_player_name();
+    else
+      username = player.get_player_name();
+    player_names = player_names + username + ": £" +
+                   std::to_string(player.get_player_money()) + ", ";
+  }
+  std::cout << player_names << "\n";
+}
+
+void Game::display_user_hand() {
+  Card_ascii temp;
+  Card_ascii temp2;
+  for (Player player : players) {
+    if (player.get_user()){
+      for (Card card : player.get_player_hand()){
+        temp = get_card_ascii(card);
+        temp2 = temp2 + temp;
+      }
+      display_card_ascii(temp2);
+    }
+  }
+}
+
+void Game::start_round() {};
+
+void Game::display_game() {
+  this->display_phase();
+  this->display_players();
+  this->display_cards();
+  this->display_user_hand();
+}
+
+bool Player::bet(int highest_bet) {
+  int proposed_bet;
+  std::cin >> proposed_bet;
+
+  return 0;
+};
+
