@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include <string_view>
 
-
 std::string_view get_suit_name(const Suit suit) {
   switch (suit) {
   case Suit::SPADES:
@@ -54,13 +53,11 @@ std::string_view get_value_name(const Value value) {
   }
 }
 void display(std::vector<Card> &deck) {
-  for (Card &temp : deck)
-  {
+  for (Card &temp : deck) {
     std::cout << get_value_name(temp.value) << " " << get_suit_name(temp.suit)
               << std::endl;
   }
 }
-
 
 void display_card_ascii(Card &card) {
   std::string suit;
@@ -93,19 +90,22 @@ void display_card_ascii(Card &card) {
   case Value::KING:
     rank = " K";
   };
-  switch (card.suit){
-    case Suit::CLUBS: suit = "";
-    case Suit::DIAMONDS: suit = "";
-    case Suit::HEARTS: suit = "";
-    case Suit::SPADES: suit = "";
+  switch (card.suit) {
+  case Suit::CLUBS:
+    suit = "";
+  case Suit::DIAMONDS:
+    suit = "";
+  case Suit::HEARTS:
+    suit = "";
+  case Suit::SPADES:
+    suit = "";
   };
 }
 
-void display(Card & card)
-{
+void display(Card &card) {
 
   std::cout << get_value_name(card.value) << " " << get_suit_name(card.suit)
-    << std::endl;
+            << std::endl;
 }
 
 void init_deck(std::vector<Card> &deck) {
