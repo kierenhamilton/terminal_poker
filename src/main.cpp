@@ -11,6 +11,9 @@ int main() {
   game.set_blind(100);
   game.setup();
   game.start_round();
+  game.start_round();
+  game.start_round();
+  game.start_round();
 
   return 0;
 }
