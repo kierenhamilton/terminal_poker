@@ -59,7 +59,18 @@ void display(std::vector<Card> &deck) {
   }
 }
 
-void get_card_ascii(Card &card) {
+Card_ascii get_face_down_ascii(){
+  Card_ascii temp;
+  temp.line1 = "+=====+";
+  temp.line2 = "|=+=+=|";
+  temp.line3 = "|+=+=+|";
+  temp.line4 = "|=+=+=|";
+  temp.line5 = "|+=+=+|";
+  temp.line6 = "+=====+";
+}
+
+Card_ascii get_card_ascii(Card &card) {
+  Card_ascii temp;
   std::string suit;
   std::string rank;
   switch (card.value) {
@@ -100,6 +111,23 @@ void get_card_ascii(Card &card) {
   case Suit::SPADES:
     suit = "♠";
   };
+  temp.line1 = "+=====+";
+  temp.line2 = "|" + rank + "  " + suit + "|";
+  temp.line3 = "|     |";
+  temp.line4 = "|     |";
+  temp.line5 = "|" + suit + "  " + rank + "|";
+  temp.line6 = "+=====+";
+
+  return temp;
+}
+
+void display_card_ascii(const Card_ascii &card) {
+  std::cout << card.line1;
+  std::cout << card.line2;
+  std::cout << card.line3;
+  std::cout << card.line4;
+  std::cout << card.line5;
+  std::cout << card.line6;
 }
 
 void display(Card &card) {

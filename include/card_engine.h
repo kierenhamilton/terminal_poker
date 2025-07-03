@@ -38,12 +38,12 @@ struct Card_ascii {
   Card_ascii operator+(Card_ascii &card_ascii) {
     Card_ascii temp;
 
-    temp.line1 = line1 += " " + card_ascii.line1;
-    temp.line2 = line2 += " " + card_ascii.line2;
-    temp.line3 = line3 += " " + card_ascii.line3;
-    temp.line4 = line4 += " " + card_ascii.line4;
-    temp.line5 = line5 += " " + card_ascii.line5;
-    temp.line6 = line6 += " " + card_ascii.line6;
+    temp.line1 = line1 + " " + card_ascii.line1;
+    temp.line2 = line2 + " " + card_ascii.line2;
+    temp.line3 = line3 + " " + card_ascii.line3;
+    temp.line4 = line4 + " " + card_ascii.line4;
+    temp.line5 = line5 + " " + card_ascii.line5;
+    temp.line6 = line6 + " " + card_ascii.line6;
 
     return temp;
   }
@@ -60,7 +60,11 @@ std::string_view get_value_name(const Value value);
 
 Card draw_card(std::vector<Card> &deck);
 
-void get_card_ascii(Card &card);
+void display_card_ascii(const Card_ascii &card);
+
+Card_ascii get_card_ascii(Card &card);
+
+Card_ascii get_face_down_ascii();
 
 void display(std::vector<Card> &deck);
 
