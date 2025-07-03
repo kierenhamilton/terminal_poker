@@ -16,12 +16,14 @@ class Player {
 public:
   Player(std::string player_name, int player_money)
       : name(player_name), money(player_money), hand(), current_bet(0),
-        is_big_blind(0), is_small_blind(0), is_folded(0) {};
+        is_big_blind(false), is_small_blind(false), is_folded(false) {}
 
   void display_player_hand();
 
   void set_player_hand(Card card) { hand.push_back(card); };
   std::vector<Card> get_player_hand() { return hand; };
+
+  virtual ~Player() = default;
 
 private:
   std::string name;
@@ -39,8 +41,9 @@ class Game {
 public:
   Game()
       : player_number(0), phase(PREFLOP), pot(0), active_player(0), deck(),
-        players(), hidden_cards(), shown_cards() {};
+        players(), hidden_cards(), shown_cards() {}
   void add_player(std::string name, int money);
+  void setup();
   void start_round();
   void display_cards();
   void display_players();
