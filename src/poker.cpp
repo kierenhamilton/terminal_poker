@@ -87,7 +87,6 @@ void Game::display_user_hand() {
   }
 }
 
-
 int Player::bet(int &highest_bet) {
   int player_bet = 0;
   std::string user_input;
@@ -95,7 +94,6 @@ int Player::bet(int &highest_bet) {
 
     player_bet = 0;
     std::cout << "Place Bet: ";
-    std::cin >> player_bet;
 
     std::cin >> user_input;
 
@@ -105,10 +103,12 @@ int Player::bet(int &highest_bet) {
     }
     if (user_input[0] == 'c') {
       player_bet = highest_bet - current_bet;
+      std::cout << "testing";
     }
-    if (user_input[0] == 'r'){
+    if (user_input[0] == 'r') {
       player_bet = std::stoi(user_input.substr(1));
     }
+
     if (player_bet + current_bet >= highest_bet && player_bet < money) {
       highest_bet = player_bet + current_bet;
       current_bet = player_bet + current_bet;
@@ -127,7 +127,8 @@ void Game::start_round() {
   while (true) {
 
     for (Player &player : players) {
-      if (player.get_folded()) continue;
+      if (player.get_folded())
+        continue;
       std::string test;
       player.set_current_turn(true);
       this->display_game();
@@ -171,7 +172,10 @@ void Game::display_game() {
 
 void Game::display_current_bets() {
   for (Player player : players) {
-    std::cout << "Bet: £" + std::to_string(player.get_current_bet()) << ", ";
+    if (player.get_folded())
+      std::cout << "FOLDED, ";
+    else
+      std::cout << "Bet: £" + std::to_string(player.get_current_bet()) << ", ";
   }
   std::cout << "\n";
 }
@@ -202,6 +206,8 @@ void Game::turn_cards() {
 bool Game::all_bets_equal() {
   Player ref = players[0];
   for (Player player : players) {
+    if (player.get_folded())
+      continue;
     if (ref.get_current_bet() != player.get_current_bet())
       return false;
   }
@@ -213,5 +219,3 @@ void Game::reset_player_bets() {
     player.set_current_bet(0);
   }
 }
-
-
