@@ -204,11 +204,21 @@ void Game::turn_cards() {
 }
 
 bool Game::all_bets_equal() {
-  Player ref = players[0];
-  for (Player player : players) {
+  Player *ref = nullptr;
+  for (Player player : players)
+    if (!player.get_folded()) {
+      ref = &player;
+      break;
+    }
+
+  if (!ref)
+    return true;
+
+  for (Player &player : players) {
+
     if (player.get_folded())
       continue;
-    if (ref.get_current_bet() != player.get_current_bet())
+    if (player.get_current_bet() != ref->get_current_bet())
       return false;
   }
   return true;
