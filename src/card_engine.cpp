@@ -59,7 +59,7 @@ void display(std::vector<Card> &deck) {
   }
 }
 
-void display_card_ascii(Card &card) {
+void get_card_ascii(Card &card) {
   std::string suit;
   std::string rank;
   switch (card.value) {
