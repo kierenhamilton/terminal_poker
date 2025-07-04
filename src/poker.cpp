@@ -103,12 +103,10 @@ int Player::bet(int &highest_bet) {
     }
     if (user_input[0] == 'c') {
       player_bet = highest_bet - current_bet;
-      std::cout << "testing";
     }
     if (user_input[0] == 'r') {
-      player_bet = std::stoi(user_input.substr(1));
+      player_bet = highest_bet + std::stoi(user_input.substr(1)) - current_bet;
     }
-
     if (player_bet + current_bet >= highest_bet && player_bet < money) {
       highest_bet = player_bet + current_bet;
       current_bet = player_bet + current_bet;
