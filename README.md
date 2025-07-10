@@ -8,6 +8,6 @@
 - User interface
 
 ## TODO
-- Refactor
-- Add networking for multiplayer
+- Make more vareity of AI oponents
 - Fix hand eveluation function
+- Add networking for multiplayer

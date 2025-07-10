@@ -1,5 +1,7 @@
 #include "poker1.h"
 #include "card_engine.h"
+#include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -163,8 +165,28 @@ void display_player_cards(Game &game) {
   }
 }
 
-Interaction get_player_interaction(Player &player, Game &game){
-  Interaction interaction;
-
+Interaction get_player_interaction(Player &player, Game &game) {
+  Interaction interaction{};
+  std::string user_input{};
+  while (true) {
+    std::cout << "f (fold), c (call), b<number> bet: ";
+    std::cin >> user_input;
+    if (user_input[0] == 'f') {
+      interaction.type = FOLD;
+      break;
+    }
+    if (user_input[0] == 'c') {
+      interaction.type = CALL;
+      break;
+    }
+    if (user_input[0] == 'b') {
+      interaction.type = BET;
+      user_input.erase(1);
+      if (!user_input.empty() &&
+          std::all_of(user_input.begin(), user_input.end(), ::isdigit))
+        interaction.bet_amount = std::stoi(user_input);
+      break;
+    }
+  }
   return interaction;
 }
