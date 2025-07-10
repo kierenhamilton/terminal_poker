@@ -10,4 +10,4 @@
 ## TODO
 - Refactor
 - Add networking for multiplayer
-- Hand eveluation function
+- Fix hand eveluation function
