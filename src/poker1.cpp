@@ -353,8 +353,8 @@ bool is_two_pair(const std::vector<Card> &hand) {
       if (hand[i].value == hand[j].value) {
         number++;
         if (!value_ptr) {
-          continue;
           value_ptr = &hand[i].value;
+          continue;
         }
         if (hand[i].value == *value_ptr) continue;
         number++;
