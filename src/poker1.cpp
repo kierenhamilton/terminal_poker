@@ -165,11 +165,11 @@ void display_player_cards(Game &game) {
   }
 }
 
-Interaction get_player_interaction(Player &player, Game &game) {
+Interaction get_player_interaction() {
   Interaction interaction{};
   std::string user_input{};
   while (true) {
-    std::cout << "f (fold), c (call), b<number> bet: ";
+    std::cout << "f (fold), c (call), r<number> raise: ";
     std::cin >> user_input;
     if (user_input[0] == 'f') {
       interaction.type = FOLD;
@@ -179,14 +179,167 @@ Interaction get_player_interaction(Player &player, Game &game) {
       interaction.type = CALL;
       break;
     }
-    if (user_input[0] == 'b') {
-      interaction.type = BET;
-      user_input.erase(1);
-      if (!user_input.empty() &&
-          std::all_of(user_input.begin(), user_input.end(), ::isdigit))
-        interaction.bet_amount = std::stoi(user_input);
+    if (user_input[0] == 'r') {
+      user_input.erase(0, 1);
+      if (is_digits(user_input)) {
+        interaction.type = BET;
+        interaction.bet_amount = stoi(user_input);
+        break;
+      }
+    }
+    std::cout << "invalid\n";
+  }
+  return interaction;
+}
+
+const bool is_digits(const std::string &s) {
+  if (s.empty())
+    return false;
+  for (const char &c : s)
+    if (!std::isdigit(c))
+      return false;
+  return true;
+}
+
+bool set_player_interaction(Player &player, Interaction interaction,
+                            uint32_t &current_bet, uint32_t &pot) {
+  switch (interaction.type) {
+  case FOLD:
+    player.is_folded = true;
+    return true;
+  case BET:
+    if (player.money < interaction.bet_amount + current_bet) {
+      std::cout << "bet exceeds funds\n";
+      return false;
+    }
+    player.money -= (current_bet - player.current_bet) + interaction.bet_amount;
+    pot += (current_bet - player.current_bet) + interaction.bet_amount;
+    player.current_bet = current_bet += interaction.bet_amount;
+    current_bet = player.current_bet;
+    return true;
+  case CALL:
+    player.money -= current_bet - player.current_bet;
+    pot += current_bet - player.current_bet;
+    player.current_bet = current_bet;
+    return true;
+  default:
+    return false;
+  }
+}
+
+void display_game(Game &game) {
+  system("clear");
+  display_interface(game);
+  display_communal_cards(game);
+  display_player_cards(game);
+}
+
+void bet(Player &player, Game &game) {
+  while (true)
+    if (set_player_interaction(player, get_player_interaction(),
+                               game.current_bet, game.pot))
+      break;
+}
+
+void round(Game &game) {
+  bool round = 0;
+  while (true) {
+    for (Player &player : game.players) {
+      if (player.is_folded || player.all_in)
+        continue;
+      player.is_current_turn = true;
+      display_game(game);
+      bet(player, game);
+      player.is_current_turn = false;
+      if (bets_are_equal(game) && round)
+        break;
+    }
+    if (bets_are_equal(game))
+      break;
+    round = 1;
+  }
+  reset_bets(game);
+}
+
+bool bets_are_equal(Game &game) {
+  Player *player_ptr = nullptr;
+  for (Player &player : game.players) {
+    if (player.all_in || player.is_folded)
+      continue;
+    player_ptr = &player;
+  }
+
+  if (!player_ptr)
+    return true;
+
+  for (Player &player : game.players) {
+    if (player.is_folded || player.all_in)
+      continue;
+    if (player.current_bet != player_ptr->current_bet)
+      return false;
+  }
+  return true;
+}
+
+void reset_bets(Game &game) {
+  for (Player &player : game.players)
+    player.current_bet = 0;
+  game.current_bet = 0;
+}
+
+void evaluate_game(Game &game) {
+  std::vector<Card> communal = game.shown_cards;
+  std::vector<Card> temp1 = game.hidden_cards;
+  communal.insert(communal.end(), temp1.begin(), temp1.end());
+
+  for (Player &player : game.players) {
+    std::vector<Card> player_hand = player.hand;
+    player_hand.insert(player_hand.end(), communal.begin(), communal.end());
+
+    player.hand_shown = true;
+  }
+}
+
+Eval evaluate_player(std::vector<Card> hand) {
+  Eval eval{};
+
+  return eval;
+}
+
+bool is_flush(const std::vector<Card> hand) {
+  uint32_t spade_count{};
+  uint32_t club_count{};
+  uint32_t heart_count{};
+  uint32_t diamond_count{};
+
+  for (const Card &card : hand) {
+    switch (card.suit) {
+    case Suit::SPADES:
+      spade_count++;
+      break;
+    case Suit::CLUBS:
+      club_count++;
+      break;
+    case Suit::HEARTS:
+      heart_count++;
+      break;
+    case Suit::DIAMONDS:
+      diamond_count++;
       break;
     }
   }
-  return interaction;
+  if (spade_count >= 5 || club_count >= 5 || heart_count >= 5 ||
+      diamond_count >= 5)
+    return true;
+  else
+    return false;
+}
+
+bool is_pair(const std::vector<Card> hand) {
+  for (int i = 0; i < 6; i++) {
+    for (int j = i+1; j < 7; j++) {
+      if (hand[i].value == hand[j].value) return true;
+    }
+  }
+  return false;
 }

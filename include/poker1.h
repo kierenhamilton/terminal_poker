@@ -7,8 +7,28 @@
 
 typedef enum { PREFLOP, FLOP, RIVER, TURNOVER, SHOWDOWN } round_t;
 typedef enum { BET, CALL, FOLD } bet_t;
+typedef enum {
+  HIGH_CARD,
+  PAIR,
+  TWO_PAIR,
+  THREES,
+  STRAIGHT,
+  FLUSH,
+  FULL_HOUSE,
+  FOURS,
+  STRAIGHT_FLUSH,
+  ROYAL_FLUSH
+} ranking_t;
 
 struct Game;
+
+struct Eval {
+  ranking_t ranking;
+  uint32_t high_card;
+  uint32_t pair_rank;
+  uint32_t four_of_a_kind_rank;
+  std::vector<uint32_t> ordered;
+};
 
 struct Player {
 
@@ -20,6 +40,14 @@ struct Player {
   Card_ascii gui_cards{};
   bool is_current_turn{};
   bool hand_shown{};
+  bool all_in{};
+  uint32_t evaluation{};
+  Eval eval{};
+};
+
+struct Card_rank{
+  uint32_t rank;
+  uint32_t suit;
 };
 
 struct Game {
@@ -34,12 +62,14 @@ struct Game {
   uint32_t longest_player_name{};
   Card_ascii gui_cards{};
   uint32_t current_bet{};
+  uint32_t min_bet{};
 };
 
 struct Interaction {
   bet_t type;
   uint32_t bet_amount;
 };
+
 
 void add_player(Game &game, uint32_t money, std::string name);
 
@@ -55,6 +85,29 @@ void display_communal_cards(Game &game);
 
 void display_player_cards(Game &game);
 
-Interaction get_player_interaction(Player &player, Game &game);
+void display_game(Game &game);
+
+Interaction get_player_interaction();
+
+void set_player_interaction(Player &player, Interaction &interaction,
+                            uint32_t &current_bet, uint32_t &pot);
+
+void bet(Player &player, Game &game);
+
+void round(Game &game);
+
+const bool is_digits(const std::string &s);
+
+bool bets_are_equal(Game &game);
+
+void reset_bets(Game &game);
+
+void evaluate_game(Game &game);
+
+Eval evaluate_player(std::vector<Card> hand);
+
+bool is_flush(const std::vector<Card> hand);
+
+bool is_pair(const std::vector<Card> hand);
 
 #endif
