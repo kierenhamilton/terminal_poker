@@ -347,16 +347,16 @@ bool is_pair(const std::vector<Card> &hand) {
 
 bool is_two_pair(const std::vector<Card> &hand) {
   uint32_t number{};
-  const Suit *suit_ptr = nullptr;
+  const Value *value_ptr = nullptr;
   for (int i = 0; i < 6; i++) {
     for (int j = i + 1; j < 7; j++) {
       if (hand[i].value == hand[j].value) {
         number++;
-        if (!suit_ptr) {
+        if (!value_ptr) {
           continue;
-          suit_ptr = &hand[i].suit;
+          value_ptr = &hand[i].value;
         }
-        if (hand[i].suit == *suit_ptr) continue;
+        if (hand[i].value == *value_ptr) continue;
         number++;
       }
     }
