@@ -300,13 +300,13 @@ void evaluate_game(Game &game) {
   }
 }
 
-Eval evaluate_player(std::vector<Card> hand) {
+Eval evaluate_player(std::vector<Card> &hand) {
   Eval eval{};
 
   return eval;
 }
 
-bool is_flush(const std::vector<Card> hand) {
+bool is_flush(const std::vector<Card> &hand) {
   uint32_t spade_count{};
   uint32_t club_count{};
   uint32_t heart_count{};
@@ -335,11 +335,32 @@ bool is_flush(const std::vector<Card> hand) {
     return false;
 }
 
-bool is_pair(const std::vector<Card> hand) {
+bool is_pair(const std::vector<Card> &hand) {
   for (int i = 0; i < 6; i++) {
-    for (int j = i+1; j < 7; j++) {
-      if (hand[i].value == hand[j].value) return true;
+    for (int j = i + 1; j < 7; j++) {
+      if (hand[i].value == hand[j].value)
+        return true;
     }
   }
   return false;
+}
+
+bool is_two_pair(const std::vector<Card> &hand) {
+  uint32_t number{};
+  const Suit *suit_ptr = nullptr;
+  for (int i = 0; i < 6; i++) {
+    for (int j = i + 1; j < 7; j++) {
+      if (hand[i].value == hand[j].value) {
+        number++;
+        if (!suit_ptr) {
+          continue;
+          suit_ptr = &hand[i].suit;
+        }
+        if (hand[i].suit == *suit_ptr) continue;
+        number++;
+      }
+    }
+  }
+  if (number == 2) return true;
+  else return false;
 }

@@ -104,10 +104,12 @@ void reset_bets(Game &game);
 
 void evaluate_game(Game &game);
 
-Eval evaluate_player(std::vector<Card> hand);
+Eval evaluate_player(std::vector<Card> &hand);
 
-bool is_flush(const std::vector<Card> hand);
+bool is_flush(const std::vector<Card>& hand);
 
-bool is_pair(const std::vector<Card> hand);
+bool is_pair(const std::vector<Card> &hand);
+
+bool is_two_pair(const std::vector<Card> &hand);
 
 #endif
