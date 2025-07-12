@@ -1,12 +1,12 @@
 #ifndef CARD_ENGINE_H
 #define CARD_ENGINE_H
+#include <cstdint>
 #include <string>
 #include <string_view>
 #include <vector>
 
-enum class Value {
-  ACE,
-  TWO,
+enum class Value : uint32_t {
+  TWO=2,
   THREE,
   FOUR,
   FIVE,
@@ -18,6 +18,7 @@ enum class Value {
   JACK,
   QUEEN,
   KING,
+  ACE,
 };
 
 enum class Suit {
@@ -61,7 +62,7 @@ std::string_view get_value_name(const Value value);
 
 Card draw_card(std::vector<Card> &deck);
 
-void display_card_ascii(const Card_ascii &card);
+void display_card_ascii(const Card_ascii &card, std::string s);
 
 Card_ascii get_card_ascii(Card &card);
 

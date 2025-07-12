@@ -83,7 +83,7 @@ void display_interface(Game &game);
 
 void display_communal_cards(Game &game);
 
-void display_player_cards(Game &game);
+void display_player_cards(Game &game, std::string s);
 
 void display_game(Game &game);
 

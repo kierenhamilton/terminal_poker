@@ -4,6 +4,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -155,13 +156,15 @@ void display_interface(Game &game) {
   std::cout << "Pot @ £" << game.pot << "\n";
 }
 
-void display_communal_cards(Game &game) { display_card_ascii(game.gui_cards); }
+void display_communal_cards(Game &game) {
+  display_card_ascii(game.gui_cards, "");
+}
 
-void display_player_cards(Game &game) {
+void display_player_cards(Game &game, std::string s = "") {
   for (Player &player : game.players) {
     if (!player.hand_shown)
       continue;
-    display_card_ascii(player.gui_cards);
+    display_card_ascii(player.gui_cards, player.name);
   }
 }
 
@@ -228,7 +231,6 @@ bool set_player_interaction(Player &player, Interaction interaction,
 }
 
 void display_game(Game &game) {
-  system("clear");
   display_interface(game);
   display_communal_cards(game);
   display_player_cards(game);
@@ -295,72 +297,42 @@ void evaluate_game(Game &game) {
   for (Player &player : game.players) {
     std::vector<Card> player_hand = player.hand;
     player_hand.insert(player_hand.end(), communal.begin(), communal.end());
+    std::cout << "Player: " << player.name << ", hand: " << player_hand.size()
+              << "\n";
 
+    evaluate_player(player_hand);
     player.hand_shown = true;
   }
+  // display_game(game);
 }
 
 Eval evaluate_player(std::vector<Card> &hand) {
   Eval eval{};
-
-  return eval;
-}
-
-bool is_flush(const std::vector<Card> &hand) {
-  uint32_t spade_count{};
-  uint32_t club_count{};
-  uint32_t heart_count{};
-  uint32_t diamond_count{};
+  std::map<Suit, uint32_t> suit_frequency;
+  std::map<Value, uint32_t> rank_frequency;
 
   for (const Card &card : hand) {
-    switch (card.suit) {
-    case Suit::SPADES:
-      spade_count++;
-      break;
-    case Suit::CLUBS:
-      club_count++;
-      break;
-    case Suit::HEARTS:
-      heart_count++;
-      break;
-    case Suit::DIAMONDS:
-      diamond_count++;
-      break;
-    }
+    rank_frequency[card.value]++;
+    suit_frequency[card.suit]++;
   }
-  if (spade_count >= 5 || club_count >= 5 || heart_count >= 5 ||
-      diamond_count >= 5)
-    return true;
-  else
-    return false;
-}
 
-bool is_pair(const std::vector<Card> &hand) {
-  for (int i = 0; i < 6; i++) {
-    for (int j = i + 1; j < 7; j++) {
-      if (hand[i].value == hand[j].value)
-        return true;
-    }
-  }
-  return false;
-}
+  std::vector<uint32_t> rank_counts;
+  std::vector<uint32_t> suit_counts;
 
-bool is_two_pair(const std::vector<Card> &hand) {
-  uint32_t number{};
-  const Value *value_ptr = nullptr;
-  for (int i = 0; i < 6; i++) {
-    for (int j = i + 1; j < 7; j++) {
-      if (hand[i].value == hand[j].value) {
-        number++;
-        if (!value_ptr) {
-          value_ptr = &hand[i].value;
-          continue;
-        }
-        if (hand[i].value == *value_ptr) continue;
-        number++;
-      }
-    }
+  for (const auto &[rank, count] : rank_frequency) {
+    rank_counts.push_back(count);
   }
-  if (number == 2) return true;
-  else return false;
+
+  for (const auto &[suit, count] : suit_frequency) {
+    suit_counts.push_back(count);
+  }
+
+  for (const uint32_t c : rank_counts) {
+    std::cout << c << ", ";
+  }
+  std::cout << "\n";
+  for (const uint32_t s : suit_counts)
+    std::cout << s << ", ";
+  std::cout << "\n";
+  return eval;
 }

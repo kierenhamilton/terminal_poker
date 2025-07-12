@@ -139,8 +139,8 @@ Card_ascii get_card_ascii(Card &card) {
   return temp;
 }
 
-void display_card_ascii(const Card_ascii &card) {
-  std::cout << card.line1 << "\n";
+void display_card_ascii(const Card_ascii &card, std::string s="") {
+  std::cout << card.line1 << " " << s << "\n";
   std::cout << card.line2 << "\n";
   std::cout << card.line3 << "\n";
   std::cout << card.line4 << "\n";
@@ -156,8 +156,9 @@ void display(Card &card) {
 
 void init_deck(std::vector<Card> &deck) {
   deck.clear();
+  int test[13] = {14,2,3,4,5,6,7,8,9,10,11,12,13};
   for (int s{0}; s < 4; s++)
-    for (int v{0}; v < 13; v++) {
+    for (int v : test) {
       deck.push_back({static_cast<Value>(v), static_cast<Suit>(s)});
     }
 }
