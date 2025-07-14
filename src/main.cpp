@@ -43,7 +43,6 @@ int main() {
     hand.clear();
     for (int i{0}; i < 7; i++)
       hand.push_back(draw_card(deck));
-    get_card_ascii_vec(hand);
     evaluate_player(hand);
   }
 

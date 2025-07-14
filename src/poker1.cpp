@@ -289,6 +289,16 @@ void reset_bets(Game &game) {
   game.current_bet = 0;
 }
 
+void display_cards_ascii(std::vector<Card> &cards) {
+  Card_ascii output{};
+  for (Card &card : cards) {
+    Card_ascii temp{};
+    temp = get_card_ascii(card);
+    output = output + temp;
+  }
+  display_card_ascii(output, "");
+}
+
 void evaluate_game(Game &game) {
   std::vector<Card> communal = game.shown_cards;
   std::vector<Card> temp1 = game.hidden_cards;
@@ -306,100 +316,47 @@ void evaluate_game(Game &game) {
   // display_game(game);
 }
 
-Eval evaluate_player(std::vector<Card> &hand) {
+Eval evaluate_player(std::vector<Card> hand) {
   Eval eval{};
-  uint32_t highest_match;
+  std::sort(hand.begin(), hand.end(),
+            [](const Card &a, const Card &b) { return a.value > b.value; });
+  std::vector<Card> ordered_hand;
   std::map<Suit, std::vector<Card>> suit_frequency;
   std::map<Value, std::vector<Card>> rank_frequency;
 
-  bool is_straight1{};
-  bool is_pair1{};
-  bool is_two_pair1{};
-  bool is_full_house1{};
-  bool is_threes1{};
-  bool is_fours1{};
-  bool is_flush1{};
-  bool is_straight_flush1{};
-  uint32_t num_pairs{};
-  uint32_t num_threes{};
+  std::vector<Card> ordered_cards;
+  std::vector<uint32_t> ordered_rank;
 
   for (const Card &card : hand) {
     rank_frequency[card.value].push_back(card);
     suit_frequency[card.suit].push_back(card);
   }
 
-  std::vector<uint32_t> rank_counts;
-  std::vector<uint32_t> suit_counts;
-  std::vector<uint32_t> ordered_rank;
-
-  for (const auto &[rank, cards] : rank_frequency) { // checks for same rank
-    rank_counts.push_back(cards.size());
-    ordered_rank.push_back(static_cast<uint32_t>(rank));
-    if (cards.size() == 2) {
-      is_pair1 = 1;
-      num_pairs++;
-    }
-    if (cards.size() == 3) {
-      is_threes1 = 1;
-      num_threes++;
-    }
-    if (cards.size() == 4)
-      is_fours1 = 1;
+  for (auto it = rank_frequency.rbegin(); it != rank_frequency.rend(); ++it) {
+    ordered_cards.insert(ordered_cards.end(), it->second.begin(),
+                         it->second.end());
   }
 
-  for (const auto &[suit, cards] : suit_frequency) { // checks for flush
-    suit_counts.push_back(cards.size());
-    if (cards.size() >= 5)
-      is_flush1 = 1;
-  }
+  for (Card &card : ordered_cards)
+    ordered_rank.push_back(static_cast<uint32_t>(card.value));
 
-  if (ordered_rank.back() == 14)
-    ordered_rank.insert(ordered_rank.begin(), 1);
+  is_flush(eval, suit_frequency);
 
-  is_straight1 = is_straight(ordered_rank);
-
-  for (uint32_t n : ordered_rank)
-    std::cout << n << ", ";
-  std::cout << "\n";
-
-  if (num_pairs >= 2 || num_pairs >= 1 && num_threes >= 1 ||
-      num_pairs && is_fours1 || num_threes >= 2)
-    is_two_pair1 = 1;
-  if (num_pairs>=1 && num_threes >=1 || num_threes>=2) is_full_house1 = 1; 
-
-  std::cout << "straight: " << ((is_straight1) ? "TRUE" : "FALSE") << "\n";
-  std::cout << "pair: " << ((is_pair1) ? "TRUE" : "FALSE") << "\n";
-  std::cout << "threes: " << ((is_threes1) ? "TRUE" : "FALSE") << "\n";
-  std::cout << "fours: " << ((is_fours1) ? "TRUE" : "FALSE") << "\n";
-  std::cout << "flush: " << ((is_flush1) ? "TRUE" : "FALSE") << "\n";
-  std::cout << "full house: " << ((is_full_house1) ? "TRUE" : "FALSE") << "\n";
-  std::cout << "two pair: " << ((is_two_pair1) ? "TRUE" : "FALSE") << "\n";
-
-  std::cout << "rank frequency: ";
-  for (const uint32_t c : rank_counts) {
-    std::cout << c << ", ";
-  }
-  std::cout << "\n";
-  std::cout << "suit frequency: ";
-  for (const uint32_t s : suit_counts)
-    std::cout << s << ", ";
-  std::cout << "\n";
   return eval;
 }
 
-bool is_straight(const std::vector<uint32_t> &ordered_rank) {
-  bool straigt = false;
-  uint32_t count = 1;
+bool is_flush(Eval &eval, std::map<Suit, std::vector<Card>> &suit_frequency) {
 
-  if (ordered_rank.size() < 5)
-    return false;
-  for (size_t i = 1; i < ordered_rank.size(); ++i) {
-    if (ordered_rank[i] == ordered_rank[i - 1] + 1) {
-      count++;
-      if (count == 5)
-        return true;
-    } else
-      count = 1;
+  std::vector<uint32_t> ranks;
+  for (auto &[suit, cards] : suit_frequency) {
+    display_cards_ascii(cards);
+    if (cards.size() >= 5) {
+      for (int i = 0; i < 5; i++)
+        ranks.push_back((static_cast<uint32_t>(cards[i].value)));
+      eval.tiebreaker = ranks; 
+      eval.ranking = FLUSH;
+      return true;
+    }
   }
   return false;
 }

@@ -3,6 +3,7 @@
 
 #include "card_engine.h"
 #include <cstdint>
+#include <map>
 #include <string>
 
 typedef enum { PREFLOP, FLOP, RIVER, TURNOVER, SHOWDOWN } round_t;
@@ -23,11 +24,10 @@ typedef enum {
 struct Game;
 
 struct Eval {
-  ranking_t ranking;
-  uint32_t high_card;
-  uint32_t pair_rank;
-  uint32_t four_of_a_kind_rank;
-  std::vector<uint32_t> ordered;
+  ranking_t ranking{};
+  uint32_t value{};
+  uint32_t secondary{};
+  std::vector<uint32_t> tiebreaker{};
 };
 
 struct Player {
@@ -45,7 +45,7 @@ struct Player {
   Eval eval{};
 };
 
-struct Card_rank{
+struct Card_rank {
   uint32_t rank;
   uint32_t suit;
 };
@@ -69,7 +69,6 @@ struct Interaction {
   bet_t type;
   uint32_t bet_amount;
 };
-
 
 void add_player(Game &game, uint32_t money, std::string name);
 
@@ -102,10 +101,11 @@ bool bets_are_equal(Game &game);
 
 void reset_bets(Game &game);
 
+void display_cards_ascii(std::vector<Card> &cards);
+
 void evaluate_game(Game &game);
 
-Eval evaluate_player(std::vector<Card> &hand);
+Eval evaluate_player(std::vector<Card> hand);
 
-bool is_straight(const std::vector<uint32_t> &ordered_rank);
-
+bool is_flush(Eval &eval, std::map<Suit, std::vector<Card>> &suit_frequency);
 #endif
