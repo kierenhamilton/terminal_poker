@@ -4,6 +4,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <iostream>
+#include <iterator>
 #include <map>
 #include <string>
 #include <vector>
@@ -289,6 +290,33 @@ void reset_bets(Game &game) {
   game.current_bet = 0;
 }
 
+std::string get_hand_type(const ranking_t &ranking) {
+  switch (ranking) {
+  case HIGH_CARD:
+    return "high card";
+  case PAIR:
+    return "pair";
+  case TWO_PAIR:
+    return "two pair";
+  case THREES:
+    return "three of a kind";
+  case STRAIGHT:
+    return "straight";
+  case FLUSH:
+    return "flush";
+  case FULL_HOUSE:
+    return "full house";
+  case FOURS:
+    return "four of a kind";
+  case STRAIGHT_FLUSH:
+    return "straight flush";
+  case ROYAL_FLUSH:
+    return "royal flush";
+  default:
+    return "???";
+  };
+}
+
 void display_cards_ascii(std::vector<Card> &cards) {
   Card_ascii output{};
   for (Card &card : cards) {
@@ -340,9 +368,22 @@ Eval evaluate_player(std::vector<Card> hand) {
   for (Card &card : ordered_cards)
     ordered_rank.push_back(static_cast<uint32_t>(card.value));
 
-  std::cout << "flush: " << (is_flush(eval, suit_frequency)? "TRUE" : "FALSE") << "\n";
-
   display_cards_ascii(hand);
+
+  std::cout << "pair: " << (is_pair(eval, ordered_rank) ? "TRUE" : "FALSE")
+            << "\n";
+
+  std::cout << "two pair: "
+            << (is_two_pair(eval, ordered_rank) ? "TRUE" : "FALSE") << "\n";
+
+  std::cout << "three of a kind: "
+            << (is_threes(eval, ordered_rank) ? "TRUE" : "FALSE") << "\n";
+
+  std::cout << "flush: " << (is_flush(eval, suit_frequency) ? "TRUE" : "FALSE")
+            << "\n";
+
+  std::cout << "hand type: " << get_hand_type(eval.ranking) << "\n";
+
   return eval;
 }
 
@@ -356,6 +397,65 @@ bool is_flush(Eval &eval, std::map<Suit, std::vector<Card>> &suit_frequency) {
         ranks.push_back((static_cast<uint32_t>(cards[i].value)));
       eval.tiebreaker = std::move(ranks);
       eval.ranking = FLUSH;
+      return true;
+    }
+  }
+  return false;
+}
+
+bool is_pair(Eval &eval, std::vector<uint32_t> ordered_rank) {
+  for (auto it = ordered_rank.begin(); it < ordered_rank.end(); ++it) {
+    auto next_it = std::next(it);
+    if (next_it != ordered_rank.end() && *it == *next_it) {
+      eval.ranking = PAIR;
+      eval.value = *it;
+      ordered_rank.erase(it, next_it + 1);
+      eval.tiebreaker.assign(std::make_move_iterator(ordered_rank.begin()),
+                             std::make_move_iterator(ordered_rank.begin() + 3));
+      return true;
+    }
+  }
+  return false;
+}
+
+bool is_two_pair(Eval &eval, std::vector<uint32_t> ordered_rank) {
+  bool one{false};
+  uint32_t temp_value_1;
+  for (int i = 0; i < 2; i++) {
+    for (auto it = ordered_rank.begin(); it < ordered_rank.end(); ++it) {
+      auto next_it = std::next(it);
+      if (next_it != ordered_rank.end() && *it == *next_it) {
+        if (one) {
+          eval.value = temp_value_1;
+          eval.secondary = *it;
+          ordered_rank.erase(it, it + 2);
+          eval.tiebreaker.assign(
+              std::make_move_iterator(ordered_rank.begin()),
+              std::make_move_iterator(ordered_rank.begin() + 1));
+          eval.ranking = TWO_PAIR;
+          return true;
+        }
+      }
+      one = true;
+      temp_value_1 = *it;
+      ordered_rank.erase(it, it + 2);
+      break;
+    }
+  }
+  return false;
+}
+
+bool is_threes(Eval &eval, std::vector<uint32_t> ordered_rank) {
+
+  for (auto it = ordered_rank.begin(); it < ordered_rank.end(); ++it) {
+    auto next_it = std::next(it);
+    auto final_it = std::next(next_it);
+    if (final_it != ordered_rank.end() && *it == *next_it && *next_it == *final_it) {
+      eval.ranking = THREES;
+      eval.value = *it;
+      ordered_rank.erase(it, next_it + 2);
+      eval.tiebreaker.assign(std::make_move_iterator(ordered_rank.begin()),
+                             std::make_move_iterator(ordered_rank.begin() + 2));
       return true;
     }
   }

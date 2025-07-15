@@ -93,6 +93,8 @@ void set_player_interaction(Player &player, Interaction &interaction,
 
 void bet(Player &player, Game &game);
 
+std::string get_hand_type(const ranking_t &ranking);
+
 void round(Game &game);
 
 const bool is_digits(const std::string &s);
@@ -108,4 +110,10 @@ void evaluate_game(Game &game);
 Eval evaluate_player(std::vector<Card> hand);
 
 bool is_flush(Eval &eval, std::map<Suit, std::vector<Card>> &suit_frequency);
+
+bool is_pair(Eval &eval, std::vector<uint32_t> ordered_rank);
+
+bool is_two_pair(Eval &eval, std::vector<uint32_t> ordered_rank);
+
+bool is_threes(Eval &eval, std::vector<uint32_t> ordered_rank);
 #endif
