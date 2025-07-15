@@ -340,20 +340,21 @@ Eval evaluate_player(std::vector<Card> hand) {
   for (Card &card : ordered_cards)
     ordered_rank.push_back(static_cast<uint32_t>(card.value));
 
-  is_flush(eval, suit_frequency);
+  std::cout << "flush: " << (is_flush(eval, suit_frequency)? "TRUE" : "FALSE") << "\n";
 
+  display_cards_ascii(hand);
   return eval;
 }
 
 bool is_flush(Eval &eval, std::map<Suit, std::vector<Card>> &suit_frequency) {
 
-  std::vector<uint32_t> ranks;
   for (auto &[suit, cards] : suit_frequency) {
-    display_cards_ascii(cards);
     if (cards.size() >= 5) {
+      std::vector<uint32_t> ranks;
+      ranks.reserve(5);
       for (int i = 0; i < 5; i++)
         ranks.push_back((static_cast<uint32_t>(cards[i].value)));
-      eval.tiebreaker = ranks; 
+      eval.tiebreaker = std::move(ranks);
       eval.ranking = FLUSH;
       return true;
     }
