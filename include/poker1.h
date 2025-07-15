@@ -109,11 +109,24 @@ void evaluate_game(Game &game);
 
 Eval evaluate_player(std::vector<Card> hand);
 
-bool is_flush(Eval &eval, std::map<Suit, std::vector<Card>> &suit_frequency);
+bool is_high_card(Eval &eval, std::vector<uint32_t> ordered_rank);
 
 bool is_pair(Eval &eval, std::vector<uint32_t> ordered_rank);
 
 bool is_two_pair(Eval &eval, std::vector<uint32_t> ordered_rank);
 
 bool is_threes(Eval &eval, std::vector<uint32_t> ordered_rank);
+
+bool is_straight(Eval &eval, std::vector<uint32_t> ordered_rank);
+
+bool is_flush(Eval &eval, std::map<Suit, std::vector<Card>> &suit_frequency);
+
+bool is_full_house(Eval &eval, std::vector<uint32_t> ordered_rank);
+
+bool is_fours(Eval &eval, std::vector<uint32_t> ordered_rank);
+
+bool is_straight_flush(Eval &eval, std::vector<Card> ordered_hand);
+
+void evaluate_players(std::vector<Player> &players, uint32_t & pot);
+
 #endif

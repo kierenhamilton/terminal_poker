@@ -2,6 +2,7 @@
 #include "card_engine.h"
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <iterator>
@@ -338,17 +339,27 @@ void evaluate_game(Game &game) {
     std::cout << "Player: " << player.name << ", hand: " << player_hand.size()
               << "\n";
 
-    evaluate_player(player_hand);
+    player.eval = evaluate_player(player_hand);
     player.hand_shown = true;
   }
   // display_game(game);
 }
 
 Eval evaluate_player(std::vector<Card> hand) {
+  uint32_t num_high_card{};
+  uint32_t num_pairs{};
+  uint32_t num_two_pairs{};
+  uint32_t num_threes{};
+  uint32_t num_straight{};
+  uint32_t num_flush{};
+  uint32_t num_full_house{};
+  uint32_t num_fours{};
+  uint32_t num_straight_flush{};
+  uint32_t num_royal_flush{};
+
   Eval eval{};
   std::sort(hand.begin(), hand.end(),
             [](const Card &a, const Card &b) { return a.value > b.value; });
-  std::vector<Card> ordered_hand;
   std::map<Suit, std::vector<Card>> suit_frequency;
   std::map<Value, std::vector<Card>> rank_frequency;
 
@@ -369,22 +380,63 @@ Eval evaluate_player(std::vector<Card> hand) {
     ordered_rank.push_back(static_cast<uint32_t>(card.value));
 
   display_cards_ascii(hand);
+  //
+  // std::cout << "high card: "
+  //           << (is_high_card(eval, ordered_rank) ? "TRUE" : "FALSE") << "\n";
+  //
+  // std::cout << "pair: " << (is_pair(eval, ordered_rank) ? "TRUE" : "FALSE")
+  //           << "\n";
+  //
+  // std::cout << "two pair: "
+  //           << (is_two_pair(eval, ordered_rank) ? "TRUE" : "FALSE") << "\n";
+  //
+  // std::cout << "three of a kind: "
+  //           << (is_threes(eval, ordered_rank) ? "TRUE" : "FALSE") << "\n";
+  //
+  // std::cout << "straight: "
+  //           << (is_straight(eval, ordered_rank) ? "TRUE" : "FALSE") << "\n";
+  //
+  // std::cout << "flush: " << (is_flush(eval, suit_frequency) ? "TRUE" :
+  // "FALSE")
+  //           << "\n";
+  //
+  // std::cout << "full house: "
+  //           << (is_full_house(eval, ordered_rank) ? "TRUE" : "FALSE") <<
+  //           "\n";
+  //
+  // std::cout << "four of a kind: "
+  //           << (is_fours(eval, ordered_rank) ? "TRUE" : "FALSE") << "\n";
+  //
+  // std::cout << "straight/royal_flush: "
+  //           << (is_straight_flush(eval, hand) ? "TRUE" : "FALSE") << "\n";
+  //
+  // std::cout << "hand type: " << get_hand_type(eval.ranking) << "\n";
 
-  std::cout << "pair: " << (is_pair(eval, ordered_rank) ? "TRUE" : "FALSE")
-            << "\n";
+  is_high_card(eval, ordered_rank);
+  is_pair(eval, ordered_rank);
+  is_two_pair(eval, ordered_rank);
+  is_threes(eval, ordered_rank);
+  is_straight(eval, ordered_rank);
+  is_flush(eval, suit_frequency);
+  is_full_house(eval, ordered_rank);
+  is_fours(eval, ordered_rank);
+  is_straight_flush(eval, hand);
 
-  std::cout << "two pair: "
-            << (is_two_pair(eval, ordered_rank) ? "TRUE" : "FALSE") << "\n";
-
-  std::cout << "three of a kind: "
-            << (is_threes(eval, ordered_rank) ? "TRUE" : "FALSE") << "\n";
-
-  std::cout << "flush: " << (is_flush(eval, suit_frequency) ? "TRUE" : "FALSE")
-            << "\n";
-
-  std::cout << "hand type: " << get_hand_type(eval.ranking) << "\n";
-
+  // std::cout << "VAL: " << eval.value;
+  // std::cout << ", SEC: " << eval.secondary;
+  // std::cout << ", TIE: ";
+  // for (uint32_t t : eval.tiebreaker)
+  //   std::cout << t << ", ";
+  // std::cout << "\n";
   return eval;
+}
+
+bool is_high_card(Eval &eval, std::vector<uint32_t> ordered_rank) {
+  eval.value = ordered_rank[0];
+  eval.secondary = 0;
+  eval.tiebreaker = {};
+  eval.ranking = HIGH_CARD;
+  return true;
 }
 
 bool is_flush(Eval &eval, std::map<Suit, std::vector<Card>> &suit_frequency) {
@@ -397,6 +449,8 @@ bool is_flush(Eval &eval, std::map<Suit, std::vector<Card>> &suit_frequency) {
         ranks.push_back((static_cast<uint32_t>(cards[i].value)));
       eval.tiebreaker = std::move(ranks);
       eval.ranking = FLUSH;
+      eval.secondary = 0;
+      eval.value = 0;
       return true;
     }
   }
@@ -409,6 +463,7 @@ bool is_pair(Eval &eval, std::vector<uint32_t> ordered_rank) {
     if (next_it != ordered_rank.end() && *it == *next_it) {
       eval.ranking = PAIR;
       eval.value = *it;
+      eval.secondary = 0;
       ordered_rank.erase(it, next_it + 1);
       eval.tiebreaker.assign(std::make_move_iterator(ordered_rank.begin()),
                              std::make_move_iterator(ordered_rank.begin() + 3));
@@ -435,11 +490,11 @@ bool is_two_pair(Eval &eval, std::vector<uint32_t> ordered_rank) {
           eval.ranking = TWO_PAIR;
           return true;
         }
+        one = true;
+        temp_value_1 = *it;
+        ordered_rank.erase(it, it + 2);
+        break;
       }
-      one = true;
-      temp_value_1 = *it;
-      ordered_rank.erase(it, it + 2);
-      break;
     }
   }
   return false;
@@ -450,8 +505,10 @@ bool is_threes(Eval &eval, std::vector<uint32_t> ordered_rank) {
   for (auto it = ordered_rank.begin(); it < ordered_rank.end(); ++it) {
     auto next_it = std::next(it);
     auto final_it = std::next(next_it);
-    if (final_it != ordered_rank.end() && *it == *next_it && *next_it == *final_it) {
+    if (next_it != ordered_rank.end() && final_it != ordered_rank.end() &&
+        *it == *next_it && *next_it == *final_it) {
       eval.ranking = THREES;
+      eval.secondary = 0;
       eval.value = *it;
       ordered_rank.erase(it, next_it + 2);
       eval.tiebreaker.assign(std::make_move_iterator(ordered_rank.begin()),
@@ -460,4 +517,130 @@ bool is_threes(Eval &eval, std::vector<uint32_t> ordered_rank) {
     }
   }
   return false;
+}
+
+bool is_straight(Eval &eval, std::vector<uint32_t> ordered_rank) {
+  if (ordered_rank.front() == 14)
+    ordered_rank.push_back(1);
+
+  uint32_t count{1};
+  uint32_t h_rank = ordered_rank[0];
+  for (auto it = ordered_rank.begin(); it < ordered_rank.end(); ++it) {
+    auto next_it = std::next(it);
+
+    if (next_it == ordered_rank.end())
+      break;
+
+    if (*it - 1 == *next_it) {
+      count++;
+      if (count == 5) {
+        eval.value = h_rank;
+        eval.secondary = 0;
+        eval.ranking = STRAIGHT;
+        eval.tiebreaker = {};
+        return true;
+      }
+    } else if (*it == *next_it)
+      continue;
+    else {
+      count = 1;
+      h_rank = *next_it;
+    }
+  }
+  return false;
+}
+
+bool is_full_house(Eval &eval, std::vector<uint32_t> ordered_rank) {
+  bool has_three{};
+  bool has_two{};
+  uint32_t temp_3_value{};
+
+  for (auto it = ordered_rank.begin(); it < ordered_rank.end(); ++it) {
+    auto next_it = std::next(it);
+    auto final_it = std::next(next_it);
+    if (next_it == ordered_rank.end() || final_it == ordered_rank.end())
+      break;
+    if (*it == *next_it && *next_it == *final_it) {
+      has_three = true;
+      temp_3_value = *it;
+      ordered_rank.erase(it, it + 3);
+      break;
+    }
+  }
+  if (!has_three)
+    return false;
+
+  for (auto it = ordered_rank.begin(); it < ordered_rank.end(); ++it) {
+    auto next_it = std::next(it);
+    if (next_it == ordered_rank.end())
+      break;
+    if (*it == *next_it) {
+      eval.value = temp_3_value;
+      eval.secondary = *it;
+      eval.ranking = FULL_HOUSE;
+      eval.tiebreaker = {};
+      return true;
+    }
+  }
+  return false;
+}
+
+bool is_fours(Eval &eval, std::vector<uint32_t> ordered_rank) {
+  for (auto it = ordered_rank.begin(); it < ordered_rank.end(); ++it) {
+    auto next_it = std::next(it);
+    auto pen_it = std::next(next_it);
+    auto final_it = std::next(pen_it);
+    if (final_it == ordered_rank.end())
+      return false;
+    if (*it == *next_it && *next_it == *pen_it && *pen_it == *final_it) {
+      eval.value = *it;
+      eval.secondary = 0;
+      eval.ranking = FOURS;
+      ordered_rank.erase(it, it + 4);
+      eval.tiebreaker.assign(std::make_move_iterator(ordered_rank.begin()),
+                             std::make_move_iterator(ordered_rank.begin() + 1));
+      return true;
+    }
+  }
+  return false;
+}
+
+bool is_straight_flush(Eval &eval, std::vector<Card> ordered_hand) {
+  std::uint32_t count{1};
+  uint32_t highest_flush{static_cast<uint32_t>(ordered_hand[0].value)};
+  if (ordered_hand[0].value == Value::ACE) {
+    ordered_hand.push_back({Value::ACE, ordered_hand[0].suit});
+  }
+
+  for (auto it = ordered_hand.begin(); it < ordered_hand.end(); ++it) {
+    auto next_it = std::next(it);
+    if (next_it == ordered_hand.end())
+      break;
+    // std::cout << "values: " << static_cast<uint32_t>(it->value) << ", \n";
+    // std::cout << "suit: " << static_cast<uint32_t>(it->suit) << ", \n";
+    if (static_cast<uint32_t>(it->suit) ==
+            static_cast<uint32_t>(next_it->suit) &&
+        static_cast<uint32_t>(it->value) ==
+            static_cast<uint32_t>(next_it->value) + 1) {
+      count++;
+      // std::cout << "count: " << count << "\n";
+      if (count == 5) {
+        eval.value = highest_flush;
+        eval.tiebreaker = {};
+        eval.secondary = 0;
+        if (highest_flush == 14)
+          eval.ranking = ROYAL_FLUSH;
+        else
+          eval.ranking = STRAIGHT_FLUSH;
+        return true;
+      }
+    } else {
+      count = 1;
+      highest_flush = static_cast<uint32_t>(next_it->value);
+    }
+  }
+  return false;
+}
+
+void evaluate_players(std::vector<Player> players, uint32_t &pot) {
 }

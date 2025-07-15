@@ -156,7 +156,7 @@ void display(Card &card) {
 
 void init_deck(std::vector<Card> &deck) {
   deck.clear();
-  int test[13] = {14,2,3,4,5,6,7,8,9,10,11,12,13};
+  int test[13] = {2,3,4,5,6,7,8,9,10,11,12,13,14};
   for (int s{0}; s < 4; s++)
     for (int v : test) {
       deck.push_back({static_cast<Value>(v), static_cast<Suit>(s)});
