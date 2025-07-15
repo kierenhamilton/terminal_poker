@@ -336,13 +336,18 @@ void evaluate_game(Game &game) {
   for (Player &player : game.players) {
     std::vector<Card> player_hand = player.hand;
     player_hand.insert(player_hand.end(), communal.begin(), communal.end());
-    std::cout << "Player: " << player.name << ", hand: " << player_hand.size()
-              << "\n";
-
     player.eval = evaluate_player(player_hand);
+
+    std::cout << "Player: " << player.name
+              << ", hand: " << get_hand_type(player.eval.ranking) << "\n";
+
     player.hand_shown = true;
   }
-  // display_game(game);
+
+  evaluate_players(game.players, game.pot);
+  for (Player &player : game.players){
+    std::cout << player.name << ": " <<get_hand_type(player.eval.ranking) << ", money: " << player.money << "\n";
+  }
 }
 
 Eval evaluate_player(std::vector<Card> hand) {
@@ -642,5 +647,17 @@ bool is_straight_flush(Eval &eval, std::vector<Card> ordered_hand) {
   return false;
 }
 
-void evaluate_players(std::vector<Player> players, uint32_t &pot) {
+void evaluate_players(std::vector<Player> &players, uint32_t &pot) {
+  std::sort(players.begin(), players.end(),
+            [](const Player &a, const Player &b) {
+              if (a.eval.ranking != b.eval.ranking)
+                return a.eval.ranking > b.eval.ranking;
+              if (a.eval.value != b.eval.value)
+                return a.eval.value > b.eval.value;
+              if (a.eval.secondary != b.eval.secondary)
+                return a.eval.secondary > b.eval.secondary;
+              return a.eval.tiebreaker > b.eval.tiebreaker;
+            });
+  players[0].money += pot;
+  pot = 0;
 }
