@@ -7,7 +7,10 @@
 - Card ascii art
 - User interface
 ![Gameplay](diagrams/gameplay.png)
+
+
+![EVALUATION](diagrams/evaluation.png)
 ## TODO
 - Make more vareity of AI oponents
-- Fix hand eveluation function
+
 - Add networking for multiplayer
