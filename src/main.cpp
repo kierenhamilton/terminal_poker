@@ -4,7 +4,6 @@
 #include <iterator>
 #include <vector>
 
-
 int main() {
 
   Game poker;
@@ -17,7 +16,7 @@ int main() {
 
   init_game(poker);
 
-  for (Player &p : poker.players) p.hand_shown = true;
+  poker.players[0].hand_shown = true;
 
   round(poker);
   next_round(poker);
@@ -28,7 +27,6 @@ int main() {
   round(poker);
 
   evaluate_game(poker);
-
 
   return 0;
 }

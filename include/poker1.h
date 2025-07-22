@@ -64,7 +64,6 @@ struct Game {
   uint32_t current_bet{};
   uint32_t min_bet{};
 };
-
 struct Interaction {
   bet_t type;
   uint32_t bet_amount;

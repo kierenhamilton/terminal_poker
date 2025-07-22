@@ -233,6 +233,7 @@ bool set_player_interaction(Player &player, Interaction interaction,
 }
 
 void display_game(Game &game) {
+  system("clear");
   display_interface(game);
   display_communal_cards(game);
   display_player_cards(game);
