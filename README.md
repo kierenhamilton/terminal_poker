@@ -10,9 +10,9 @@ A fun poker game in the terminal - perfect for game nights
 - Hand Evaluation
 - Card engine
 
-The hand evaluation ranks all of the hands, calculates tiebreakers, and lists, from best to worst, all players.
+The hand evaluation ranks all players hands, calculates tiebreakers, and lists all players from best to worst.
 ![EVALUATION](diagrams/evaluation.png)
-Tested with analysis of distributinos over 5 millio hands.
+
 ## TODO
 - Split pots
 - AI oponents
